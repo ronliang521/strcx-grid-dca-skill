@@ -71,6 +71,13 @@ metadata:
 - **Sell**：计算 `sellTokenAmount` → `swap quote` → 用户确认 → `swap execute`（STRCx→USDT，`--readable-amount "<sellTokenAmount>"`）
 - **Persist**：写入状态文件防止重复成交（见下文）
 
+## Why these commands（为什么这么调用）
+
+- **先 `market price`**：用同一数据源（OKX/onchainOS）得到 \(P\)，避免“外部价格 ≠ 成交路径价格”导致错档。
+- **先 `swap quote` 再 `swap execute`**：quote 用来暴露 priceImpact / 风险标记 / 路由变化，避免静默下单。
+- **卖出用 `sellTokenAmount = floor_to_8dp(50/P)`**：因为执行是 `exactIn`（输入量固定），用 \(P\) 估算“约等值 50U”的卖出数量，并向下取整避免超卖失败。
+- **写状态文件**：用 `buyLastFilledN` / `sellLastFilledM` 防止同一档位重复成交（价格来回震荡时尤其重要）。
+
 ## Prerequisites
 
 - `onchainos --version`
@@ -128,6 +135,18 @@ metadata:
    - 若 \(P > 120\)：计算 `S_sell`，只做下一档（默认）
 3. Quote → 用户确认 → Execute（严格遵守 `okx-dex-swap` 的风险门槛；首笔不加 `--force`）
 4. 成交后写状态
+
+## Output format（输出格式约定）
+
+每次运行本 skill，输出需包含以下字段（便于人类复核，也便于下次继续）：
+
+1. **Context**：`chain=solana`、`mint=Xs78...`、`mode=buy|sell|idle`
+2. **Price**：当前 \(P\)（原始返回里解析出的 USD 价格）
+3. **Decision**：
+   - buy：`nextBuyN`、`nextBuyLevel=B_n`、`usdtOk=true|false`
+   - sell：`nextSellM`、`nextSellLevel=S_m`、`sellTokenAmount`、`tokenOk=true|false`
+4. **Next command**：下一步要跑的命令（优先给 `swap quote`）
+5. **After execute**：若用户执行了交易，回显 `txHash/solscan`（如有）+ 预期状态更新（`buyLastFilledN` 或 `sellLastFilledM` 变更）
 
 ## Examples
 
