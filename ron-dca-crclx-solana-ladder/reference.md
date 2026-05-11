@@ -8,7 +8,7 @@
 | 链 | `solana` 或 `501` |
 | Solana USDT | `Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB` |
 | 买入网格 | `B_n = 102 - 0.5*n`，`n ≥ 0` |
-| 卖出网格 | `S_m = 120 + 0.5*m`，`m ≥ 0`（仅当价格 > 120 才激活卖出侧） |
+| 卖出网格 | `S_m = 102 + 0.5*m`，`m ≥ 0`（仅当价格 > 102 才激活卖出侧） |
 | 每档买入 | `50`（USDT，`--readable-amount "50"`） |
 | 每档卖出 | 约等值 `50` USDT 的 STRCx：`sellTokenAmount = floor_to_8dp(50 / P)` |
 

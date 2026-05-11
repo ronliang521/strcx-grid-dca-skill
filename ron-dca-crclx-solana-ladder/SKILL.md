@@ -1,7 +1,7 @@
 ---
 name: ron-dca-crclx-solana-ladder
 description: >-
-  Solana STRCx two-sided grid for mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH: buy 50 USDT per 0.5 down from 102, and sell ~50 USDT worth per 0.5 up after price >120.
+  Solana STRCx two-sided grid for mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH: buy 50 USDT per 0.5 down from 102, and sell ~50 USDT worth per 0.5 up after price >102.
 license: MIT
 metadata:
   author: ron-workspace
@@ -17,14 +17,14 @@ metadata:
 
 - `STRCx grid` / `STRCx 网格` / `Xs78 网格`
 - `102开始每跌0.5买50U`
-- `120以上每涨0.5卖50U`
+- `102以上每涨0.5卖50U`
 
 ## Examples（推荐用户说法）
 
-- “帮我对 **STRCx（Xs78）** 做一个 **Solana 网格**：**跌到 102 开始**，每跌 **0.5** 买 **50U USDT**；**涨到 120 以上**，每涨 **0.5** 卖 **50U 等值**。”
+- “帮我对 **STRCx（Xs78）** 做一个 **Solana 网格**：**跌到 102 开始**，每跌 **0.5** 买 **50U USDT**；**涨到 102 以上**，每涨 **0.5** 卖 **50U 等值**。”
 - “STRCx 价格到 102 触发网格买入，往下每 0.5 一档买 50U，直到 USDT 用完。”
-- “STRCx >120 才开始卖，向上每 0.5 卖一档（约 50U），卖到没币为止。”
-- “Xs78 这个 mint 在 Solana 上做双向网格：102 买、120 卖，步长 0.5，每档 50U。”
+- “STRCx >102 才开始卖，向上每 0.5 卖一档（约 50U），卖到没币为止。”
+- “Xs78 这个 mint 在 Solana 上做双向网格：102 买、102+ 卖，步长 0.5，每档 50U。”
 
 ## Exclusions（不要用本 skill）
 
@@ -47,10 +47,10 @@ metadata:
 - **每档买入**：**50 USDT**（Solana USDT mint `Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB`）
 - **停止**：钱包 **USDT < 50** 时停止继续买
 
-### B. 卖出网格（120 以上后向上）
+### B. 卖出网格（102 以上后向上）
 
-- **激活**：当 USD 现价 \(P > 120\)（满足“120 以上”条件后才启用卖出侧）
-- **网格**：\(S_m = 120 + 0.5m\)，\(m=0,1,2,...\)
+- **激活**：当 USD 现价 \(P > 102\)（满足“102 以上”条件后才启用卖出侧）
+- **网格**：\(S_m = 102 + 0.5m\)，\(m=0,1,2,...\)
 - **每档卖出**：卖出“**约等值 50 USDT**”的 STRCx  
   - 因 `onchainos swap execute` 为 **exactIn**，本策略按价格估算卖出数量：  
     \[
@@ -92,7 +92,7 @@ metadata:
 2. `onchainos wallet balance --chain solana`（确认 USDT、STRCx、SOL）
 3. `onchainos market price --address Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH --chain solana`
 4. 若 \(P \le 102\)：执行“下一档买入”（默认只做一档）
-5. 若 \(P > 120\)：执行“下一档卖出”（默认只做一档）
+5. 若 \(P > 102\)：执行“下一档卖出”（默认只做一档）
 6. 更新状态文件
 
 ## Contest mode（用于 Agentic 交易大赛的合规约束）
@@ -132,7 +132,7 @@ metadata:
 1. 读价：`onchainos market price ...` 取 \(P\)
 2. 决策：
    - 若 \(P \le 102\)：计算 `S_buy`，只做下一档（默认）
-   - 若 \(P > 120\)：计算 `S_sell`，只做下一档（默认）
+   - 若 \(P > 102\)：计算 `S_sell`，只做下一档（默认）
 3. Quote → 用户确认 → Execute（严格遵守 `okx-dex-swap` 的风险门槛；首笔不加 `--force`）
 4. 成交后写状态
 
@@ -151,5 +151,5 @@ metadata:
 ## Examples
 
 - **买入例**：\(P=101.2\)，`buyLastFilledN=-1` → 下一档 `n=0`（102）满足 → 买 50 USDT；`buyLastFilledN=0`
-- **卖出例**：\(P=121.1\)，`sellLastFilledM=-1` 且 \(P>120\) 激活 → 下一档 `m=0`（120）满足 → 卖出约 \(50/121.1\) STRCx（8 位小数向下取整）；`sellLastFilledM=0`
+- **卖出例**：\(P=103.1\)，`sellLastFilledM=-1` 且 \(P>102\) 激活 → 下一档 `m=0`（102）满足 → 卖出约 \(50/103.1\) STRCx（8 位小数向下取整）；`sellLastFilledM=0`
 
