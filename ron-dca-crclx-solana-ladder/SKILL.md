@@ -1,7 +1,7 @@
 ---
 name: ron-dca-crclx-solana-ladder
 description: >-
-  Ron's Solana ladder DCA for mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH (OKX symbol STRCx; user may say CRCLx): when OKX USD price ≤ 100, buy 20% of the chosen stablecoin balance (USDT/USDC) per 0.5 USD grid step downward (L_n=100−0.5n). ONLY onchainOS for price and swaps plus okx-dex-market, okx-dex-swap, okx-dex-token, okx-security, okx-agentic-wallet. Triggers: CRCLx/STRCx ladder, 定投 Xs78, 每跌0.5买余额20%, 100以下网格, Ron ladder DCA. Exclude DApp-named venues (okx-dapp-discovery), non-Solana mints, generic DCA without this mint.
+  Ron's Solana ladder DCA for STRCx (mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH): when OKX USD price ≤ 100, buy 20% of the chosen stablecoin balance (USDT/USDC) per 0.5 USD grid step downward (L_n=100−0.5n). ONLY onchainOS for price and swaps plus okx-dex-market, okx-dex-swap, okx-dex-token, okx-security, okx-agentic-wallet. Triggers: STRCx ladder, 定投 STRCx, 定投 Xs78, 每跌0.5买余额20%, 100以下网格, Ron ladder DCA. Exclude DApp-named venues (okx-dapp-discovery), non-Solana mints, generic DCA without this mint.
 license: MIT
 metadata:
   author: ron-workspace
@@ -9,19 +9,19 @@ metadata:
   homepage: "https://web3.okx.com"
 ---
 
-# Ron — STRCx / CRCLx Solana 价格网格定投（onchainOS）
+# Ron — STRCx Solana 价格网格定投（onchainOS）
 
-> **符号说明**：链上/OKX DEX 聚合里该 mint 常显示为 **STRCx**（全名可能带 xStock 类描述）。你在对话里说的 **CRCLx** 视为同一标的：`Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH`。
+> **符号说明**：链上/OKX DEX 聚合里该 mint 常显示为 **STRCx**（全名可能带 xStock 类描述）。标的 mint：`Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH`。
 
 ## Overview
 
-一个可复用的 **Solana 网格定投策略 Skill**：当 STRCx/CRCLx（mint `Xs78…`) 的 OKX USD 价格跌到 100 及以下后，按 **每下跌 0.5 美元买入“账户稳定币余额的 20%”** 的阶梯逻辑执行买入，并用本地状态防止同一档重复成交。  
+一个可复用的 **Solana 网格定投策略 Skill**：当 STRCx（mint `Xs78…`) 的 OKX USD 价格跌到 100 及以下后，按 **每下跌 0.5 美元买入“账户稳定币余额的 20%”** 的阶梯逻辑执行买入，并用本地状态防止同一档重复成交。  
 
 若用于 [Agentic 交易大赛 | Boost 交易赛](https://web3.okx.com/zh-hans/boost/trading-competition/agentic-trading)，支持“活动模式”合规约束与进度自查（自查不等于后台口径）。
 
 ## Core operations
 
-- **Price**：`onchainos market price` 读取 STRCx/CRCLx USD 现价 \(P\)
+- **Price**：`onchainos market price` 读取 STRCx USD 现价 \(P\)
 - **Decide**：根据 \(L_n = 100 - 0.5n\) 与 `lastFilledN` 计算“下一档是否触发”
 - **Execute**：用 `onchainos swap quote` → 用户确认 → `onchainos swap execute` 买入**余额 20%**
 - **Persist**：写入 `.cursor/state/ron-dca-crclx-solana-ladder.json`（防重复买）

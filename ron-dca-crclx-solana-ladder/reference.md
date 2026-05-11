@@ -1,10 +1,10 @@
-# Reference — STRCx / CRCLx 网格定投（Solana）
+# Reference — STRCx 网格定投（Solana）
 
 ## 常量
 
 | 含义 | 地址 / 值 |
 |------|-----------|
-| 标的 mint（STRCx / 你称 CRCLx） | `Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH` |
+| 标的 mint（STRCx） | `Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH` |
 | 链 | `solana` 或 `501` |
 | Solana USDT | `Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB` |
 | Solana USDC | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |

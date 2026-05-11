@@ -1,10 +1,10 @@
-# STRCx / CRCLx Solana Grid DCA Skill
+# STRCx Solana Grid DCA Skill
 
 This repo contains a single Cursor skill: a **Solana ladder/grid DCA** for mint:
 
 `Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH`
 
-The token is often shown as **STRCx** in OKX/onchainOS; the user may refer to it as **CRCLx**.
+The token is often shown as **STRCx** in OKX/onchainOS.
 
 ## What it does
 
