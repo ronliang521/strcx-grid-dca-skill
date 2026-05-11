@@ -1,17 +1,28 @@
 ---
 name: ron-dca-crclx-solana-ladder
 description: >-
-  Ron's Solana STRCx two-sided grid for mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH: when price falls to 102, buy 50 USDT each 0.5 USD step down; after price rises above 120, sell ~50 USDT worth each 0.5 USD step up until token balance is depleted. Uses ONLY onchainOS (market price + swap quote/execute) and OKX skills okx-dex-market, okx-dex-swap, okx-dex-token, okx-security, okx-agentic-wallet. Triggers: STRCx grid, STRCx 网格, Xs78 网格, 102开始每跌0.5买50U, 120以上每涨0.5卖50U. Excludes venue-named DApps (route okx-dapp-discovery) and non-Solana mints.
+  Solana STRCx two-sided grid for mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH: buy 50 USDT per 0.5 down from 102, and sell ~50 USDT worth per 0.5 up after price >120.
 license: MIT
 metadata:
   author: ron-workspace
   version: "2.0.0"
-  homepage: "https://web3.okx.com"
+  homepage: "https://github.com/ronliang521/strcx-grid-dca-skill"
 ---
 
 # Ron — STRCx Solana 双向网格（onchainOS）
 
 标的（Solana mint）：`Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH`（OKX/onchainOS 常显示符号 **STRCx**）。
+
+## Triggers（触发词）
+
+- `STRCx grid` / `STRCx 网格` / `Xs78 网格`
+- `102开始每跌0.5买50U`
+- `120以上每涨0.5卖50U`
+
+## Exclusions（不要用本 skill）
+
+- 用户指定具体 DApp 场所（Raydium/Uniswap 等）→ 走 `okx-dapp-discovery`
+- 非 Solana、或 mint 不匹配 `Xs78...` → 新策略，禁止复用本状态文件
 
 ## Strategy spec（唯一权威）
 
