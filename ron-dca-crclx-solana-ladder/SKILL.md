@@ -19,10 +19,24 @@ metadata:
 - `102开始每跌0.5买50U`
 - `120以上每涨0.5卖50U`
 
+## Examples（推荐用户说法）
+
+- “帮我对 **STRCx（Xs78）** 做一个 **Solana 网格**：**跌到 102 开始**，每跌 **0.5** 买 **50U USDT**；**涨到 120 以上**，每涨 **0.5** 卖 **50U 等值**。”
+- “STRCx 价格到 102 触发网格买入，往下每 0.5 一档买 50U，直到 USDT 用完。”
+- “STRCx >120 才开始卖，向上每 0.5 卖一档（约 50U），卖到没币为止。”
+- “Xs78 这个 mint 在 Solana 上做双向网格：102 买、120 卖，步长 0.5，每档 50U。”
+
 ## Exclusions（不要用本 skill）
 
 - 用户指定具体 DApp 场所（Raydium/Uniswap 等）→ 走 `okx-dapp-discovery`
 - 非 Solana、或 mint 不匹配 `Xs78...` → 新策略，禁止复用本状态文件
+
+## Anti-examples（不要这样触发 / 易误触）
+
+- “在 **Raydium/Uniswap/Jupiter** 上做 STRCx 网格” → 这是指定场所，不用本 skill
+- “给我做 **BTC/ETH/SOL** 网格” → 标的不匹配
+- “Base/Arbitrum 上的 STRCx” → 链不匹配（本 skill 仅 Solana）
+- “帮我刷三次、秒买秒卖回 USDT” → 活动模式下属于可疑刷量诉求，必须拒绝
 
 ## Strategy spec（唯一权威）
 
