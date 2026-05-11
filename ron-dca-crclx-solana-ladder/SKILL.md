@@ -1,7 +1,7 @@
 ---
 name: ron-dca-crclx-solana-ladder
 description: >-
-  Ron's Solana ladder DCA for mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH (OKX symbol STRCx; user may say CRCLx): when OKX USD price ≤ 100, buy 50 USD notional per 0.5 USD grid step downward (L_n=100−0.5n). ONLY onchainOS for price and swaps plus okx-dex-market, okx-dex-swap, okx-dex-token, okx-security, okx-agentic-wallet. Triggers: CRCLx/STRCx ladder, 定投 Xs78, 每跌0.5买50U, 100以下网格, Ron ladder DCA. Exclude DApp-named venues (okx-dapp-discovery), non-Solana mints, generic DCA without this mint.
+  Ron's Solana ladder DCA for mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH (OKX symbol STRCx; user may say CRCLx): when OKX USD price ≤ 100, buy 20% of the chosen stablecoin balance (USDT/USDC) per 0.5 USD grid step downward (L_n=100−0.5n). ONLY onchainOS for price and swaps plus okx-dex-market, okx-dex-swap, okx-dex-token, okx-security, okx-agentic-wallet. Triggers: CRCLx/STRCx ladder, 定投 Xs78, 每跌0.5买余额20%, 100以下网格, Ron ladder DCA. Exclude DApp-named venues (okx-dapp-discovery), non-Solana mints, generic DCA without this mint.
 license: MIT
 metadata:
   author: ron-workspace
@@ -15,7 +15,7 @@ metadata:
 
 ## Overview
 
-一个可复用的 **Solana 网格定投策略 Skill**：当 STRCx/CRCLx（mint `Xs78…`) 的 OKX USD 价格跌到 100 及以下后，按 **每下跌 0.5 美元买入 50U** 的阶梯逻辑执行买入，并用本地状态防止同一档重复成交。  
+一个可复用的 **Solana 网格定投策略 Skill**：当 STRCx/CRCLx（mint `Xs78…`) 的 OKX USD 价格跌到 100 及以下后，按 **每下跌 0.5 美元买入“账户稳定币余额的 20%”** 的阶梯逻辑执行买入，并用本地状态防止同一档重复成交。  
 
 若用于 [Agentic 交易大赛 | Boost 交易赛](https://web3.okx.com/zh-hans/boost/trading-competition/agentic-trading)，支持“活动模式”合规约束与进度自查（自查不等于后台口径）。
 
@@ -23,7 +23,7 @@ metadata:
 
 - **Price**：`onchainos market price` 读取 STRCx/CRCLx USD 现价 \(P\)
 - **Decide**：根据 \(L_n = 100 - 0.5n\) 与 `lastFilledN` 计算“下一档是否触发”
-- **Execute**：用 `onchainos swap quote` → 用户确认 → `onchainos swap execute` 买入 50U
+- **Execute**：用 `onchainos swap quote` → 用户确认 → `onchainos swap execute` 买入**余额 20%**
 - **Persist**：写入 `.cursor/state/ron-dca-crclx-solana-ladder.json`（防重复买）
 - **Contest safety**：活动模式下禁止循环/对冲刷量，并提示 ≥$100 资产维持要求
 
@@ -32,7 +32,7 @@ metadata:
 - `onchainos` CLI 已安装且可运行：`onchainos --version`
 - Agentic Wallet 已登录：`onchainos wallet status` 显示 `loggedIn: true`
 - Solana 钱包有：
-  - **稳定币**（USDT 或 USDC）≥ 50（用于每档买入）
+  - **稳定币**（USDT 或 USDC）有余额（用于每档买入，按余额 20% 动态计算）
   - 少量 **SOL**（用于 gas）
 
 ## Quick Start（活动与非活动通用）
@@ -44,7 +44,7 @@ metadata:
    - `onchainos market price --address Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH --chain solana`
 3. **若 \(P \le 100\)**：按本 skill 规则只触发 **下一档**（默认）：
    - `swap quote` → 显示 priceImpact / 风险项 → 用户确认
-   - `swap execute`（50U）
+   - `swap execute`（本次买入额 = 余额 20%）
 4. **写入状态**：更新 `lastFilledN`、`updatedAt`、`payToken`（见“状态”）
 
 ## Checklist（活动模式达标导向）
@@ -90,16 +90,16 @@ metadata:
 | **价格源** | OKX / onchainOS：`onchainos market price --address <mint> --chain solana` 的 **USD 现价 `P`** |
 | **激活条件** | **`P ≤ 100`** 后进入网格（未激活前只观察，不买入） |
 | **网格步长** | **0.5 USD** |
-| **每档买入** | **50 USD** 名义（`exactIn`，`--readable-amount "50"`） |
+| **每档买入** | **账户稳定币余额的 20%**（`exactIn`；USDT/USDC，6 位小数） |
 | **网格线** | `L_n = 100 − 0.5 × n`，`n = 0,1,2,…` → 100, 99.5, 99, … |
 
-**单档语义**：当 **`P ≤ L_n`** 且状态里 **`n` 尚未标记已成交**，则该档 **可触发一次** 50U 买入；成交后写入 `lastFilledN ≥ n`（见 **状态**）。价格反弹后再跌回，**已成交档不重复买**（除非用户重置状态）。
+**单档语义**：当 **`P ≤ L_n`** 且状态里 **`n` 尚未标记已成交**，则该档 **可触发一次**买入：金额 = 触发时刻所选稳定币余额的 **20%**；成交后写入 `lastFilledN ≥ n`（见 **状态**）。价格反弹后再跌回，**已成交档不重复买**（除非用户重置状态）。
 
 <MUST>
 **硬性要求**：读价与下单 **只能** 走 **onchainOS**（`onchainos`）及下方列出的 **OKX skills**。禁止用「只看 CoinGecko 就下单」替代；外链仅可作用户要求的 **交叉验证**，不得作为执行路径。
 </MUST>
 
-## 支付币种（50U 用 USDT 还是 USDC）
+## 支付币种（用 USDT 还是 USDC）
 
 1. 运行 `onchainos wallet balance --chain solana`。  
 2. **默认**：若 **USDT 余额 ≥ 50** 且不低于 USDC，则用 **USDT**（`Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB`）；否则用 **USDC**（`EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`）。  
@@ -113,7 +113,7 @@ metadata:
 | CLI 预检 | 读 `okx-agentic-wallet/_shared/preflight.md`；`export PATH="$HOME/.local/bin:$PATH"` |
 | USD 价格 | `okx-dex-market` → `onchainos market price --address Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH --chain solana` |
 | 代币信息 / 风险 | `okx-dex-token`；高敏感场景 `okx-security` |
-| 50U 换入标的 | `okx-dex-swap` → `swap quote` → 用户确认 → `swap execute` |
+| 换入标的 | `okx-dex-swap` → `swap quote` → 用户确认 → `swap execute` |
 | 钱包 / Gas | `okx-agentic-wallet` |
 
 ## 执行流程（Agent 逐步）
@@ -131,7 +131,7 @@ metadata:
 4. **`P ≤ 100`**  
    - 读取状态文件 `lastFilledN`（缺省 **-1**）。  
    - 集合 `S = { n ∈ ℕ | P ≤ L_n 且 n > lastFilledN }`。  
-   - **默认（安全）**：只执行 **`min(S)`** 对应的一档：先 `swap quote`，再经用户确认后 `swap execute` **50** 单位稳定币 → mint；成功后 **`lastFilledN = min(S)`**。  
+   - **默认（安全）**：只执行 **`min(S)`** 对应的一档：先 `swap quote`，再经用户确认后 `swap execute`（本次买入额 = 所选稳定币余额的 **20%**）→ mint；成功后 **`lastFilledN = min(S)`**。  
    - **补档（用户明确要求）**：按 `n` 升序列出待补档，**每一档单独 quote + 确认**；单次对话建议 **≤ 5 档**，更多需用户再次确认风险。  
 
 5. **Swap**（遵守 `okx-dex-swap`）  
@@ -140,7 +140,7 @@ metadata:
 
 6. **写状态**  
    - 更新 `.cursor/state/ron-dca-crclx-solana-ladder.json` 的 `lastFilledN` 与 `updatedAt`（ISO8601）。  
-   - 同时将本次名义成交额（固定为 50）累加到 `cumulativeNotionalUsd`（字符串形式保存，避免浮点误差）；更新 `lastTradeAt`。  
+   - 同时将本次名义成交额（= 本次实际 `--readable-amount`）累加到 `cumulativeNotionalUsd`（字符串形式保存，避免浮点误差）；更新 `lastTradeAt`。  
 
 ## 状态（防重复成交）
 
@@ -205,9 +205,9 @@ metadata:
 
 ## 示例
 
-**例 A**：`P=99.2`，`lastFilledN=-1` → `S={0,1}`，默认只买 **n=0**（50U），然后 `lastFilledN=0`。  
+**例 A**：`P=99.2`，`lastFilledN=-1` → `S={0,1}`，默认只买 **n=0**（买入额=稳定币余额 20%），然后 `lastFilledN=0`。  
 
-**例 B**：`P=98.9`，`lastFilledN=0` → 下一档 **n=1**（99.5），`98.9≤99.5` → 买 50U，`lastFilledN=1`。  
+**例 B**：`P=98.9`，`lastFilledN=0` → 下一档 **n=1**（99.5），`98.9≤99.5` → 买入额=稳定币余额 20%，`lastFilledN=1`。  
 
 **例 C**：`strategyVariant=firstRung99p5`，`P=99.8`，`lastFilledN=-1` → **n=0 跳过**，`S={1}`（若 `P≤99.5` 才含 1）；仅 `P≤99.5` 时买 **n=1**。
 

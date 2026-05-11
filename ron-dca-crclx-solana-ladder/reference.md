@@ -9,7 +9,7 @@
 | Solana USDT | `Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB` |
 | Solana USDC | `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v` |
 | 网格 | `L_n = 100 - 0.5*n`，`n ≥ 0` |
-| 每档名义 | `50`（`--readable-amount "50"`） |
+| 每档名义 | `stable_balance * 0.20`（USDT/USDC；按 6 位小数取整） |
 
 ## 命令模板
 
@@ -23,19 +23,19 @@ onchainos market price --address Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH --c
 onchainos wallet balance --chain solana
 ```
 
-**用 USDT 买 50U 标的：**
+**用 USDT 买入（金额=USDT余额*20%）：**
 
 ```bash
 onchainos swap quote \
   --from Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB \
   --to Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH \
-  --readable-amount "50" \
+  --readable-amount "<USDT_balance * 0.20>" \
   --chain solana
 
 onchainos swap execute \
   --from Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB \
   --to Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH \
-  --readable-amount "50" \
+  --readable-amount "<USDT_balance * 0.20>" \
   --chain solana \
   --wallet "<你的 Solana 地址>"
 ```
