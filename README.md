@@ -18,12 +18,12 @@ The token is often shown as **STRCx** in OKX/onchainOS.
 
 Copy the folder into your project:
 
-- `ron-dca-crclx-solana-ladder/` → `.cursor/skills/ron-dca-crclx-solana-ladder/`
+- `ron-strcx-solana-102-grid/` → `.cursor/skills/ron-strcx-solana-102-grid/`
 
 Then in Cursor, reference the skill by name or trigger terms (see `SKILL.md`).
 
 ## Files
 
-- `ron-dca-crclx-solana-ladder/SKILL.md`
-- `ron-dca-crclx-solana-ladder/reference.md`
+- `ron-strcx-solana-102-grid/SKILL.md`
+- `ron-strcx-solana-102-grid/reference.md`
 

@@ -1,5 +1,5 @@
 ---
-name: ron-dca-crclx-solana-ladder
+name: ron-strcx-solana-102-grid
 description: >-
   Solana STRCx two-sided grid for mint Xs78JED6PFZxWc2wCEPspZW9kL3Se5J7L5TChKgsidH: buy 50 USDT per 0.5 down from 102, and sell ~50 USDT worth per 0.5 up after price >102.
 license: MIT
